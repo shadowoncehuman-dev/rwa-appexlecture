@@ -95,7 +95,8 @@ export async function downloadSource(
     return;
   }
 
-  const playlist = await fetch(proxied(source.url), { signal }).then((r) => {
+  const init: RequestInit = signal ? { signal } : {};
+  const playlist = await fetch(proxied(source.url), init).then((r) => {
     if (!r.ok) throw new Error("playlist_failed");
     return r.text();
   });
@@ -109,7 +110,7 @@ export async function downloadSource(
 
   const parts: BlobPart[] = [];
   for (let i = 0; i < segments.length; i++) {
-    const res = await fetch(segments[i]!, { signal });
+    const res = await fetch(segments[i]!, init);
     if (!res.ok) throw new Error("segment_failed");
     parts.push(await res.arrayBuffer());
     onProgress(Math.round(((i + 1) / segments.length) * 100));
