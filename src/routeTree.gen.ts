@@ -10,33 +10,149 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PlayerRouteImport } from './routes/player'
+import { Route as SavedRouteImport } from './routes/saved'
+import { Route as TestSeriesRouteImport } from './routes/test-series'
+import { Route as ApiProxyRouteImport } from './routes/api/proxy'
+import { Route as CourseCourseIdRouteImport } from './routes/course.$courseId'
+import { Route as CourseCourseIdIndexRouteImport } from './routes/course.$courseId.index'
+import { Route as CourseCourseIdSubjectSubjectIdRouteImport } from './routes/course.$courseId.subject.$subjectId'
+import { Route as CourseCourseIdSubjectSubjectIdIndexRouteImport } from './routes/course.$courseId.subject.$subjectId.index'
+import { Route as CourseCourseIdSubjectSubjectIdTopicTopicIdRouteImport } from './routes/course.$courseId.subject.$subjectId.topic.$topicId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlayerRoute = PlayerRouteImport.update({
+  id: '/player',
+  path: '/player',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SavedRoute = SavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TestSeriesRoute = TestSeriesRouteImport.update({
+  id: '/test-series',
+  path: '/test-series',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProxyRoute = ApiProxyRouteImport.update({
+  id: '/api/proxy',
+  path: '/api/proxy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CourseCourseIdRoute = CourseCourseIdRouteImport.update({
+  id: '/course/$courseId',
+  path: '/course/$courseId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CourseCourseIdIndexRoute = CourseCourseIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CourseCourseIdRoute,
+} as any)
+const CourseCourseIdSubjectSubjectIdRoute =
+  CourseCourseIdSubjectSubjectIdRouteImport.update({
+    id: '/subject/$subjectId',
+    path: '/subject/$subjectId',
+    getParentRoute: () => CourseCourseIdRoute,
+  } as any)
+const CourseCourseIdSubjectSubjectIdIndexRoute =
+  CourseCourseIdSubjectSubjectIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => CourseCourseIdSubjectSubjectIdRoute,
+  } as any)
+const CourseCourseIdSubjectSubjectIdTopicTopicIdRoute =
+  CourseCourseIdSubjectSubjectIdTopicTopicIdRouteImport.update({
+    id: '/topic/$topicId',
+    path: '/topic/$topicId',
+    getParentRoute: () => CourseCourseIdSubjectSubjectIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/player': typeof PlayerRoute
+  '/saved': typeof SavedRoute
+  '/test-series': typeof TestSeriesRoute
+  '/api/proxy': typeof ApiProxyRoute
+  '/course/$courseId': typeof CourseCourseIdRouteWithChildren
+  '/course/$courseId/': typeof CourseCourseIdIndexRoute
+  '/course/$courseId/subject/$subjectId': typeof CourseCourseIdSubjectSubjectIdRouteWithChildren
+  '/course/$courseId/subject/$subjectId/': typeof CourseCourseIdSubjectSubjectIdIndexRoute
+  '/course/$courseId/subject/$subjectId/topic/$topicId': typeof CourseCourseIdSubjectSubjectIdTopicTopicIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/player': typeof PlayerRoute
+  '/saved': typeof SavedRoute
+  '/test-series': typeof TestSeriesRoute
+  '/api/proxy': typeof ApiProxyRoute
+  '/course/$courseId': typeof CourseCourseIdIndexRoute
+  '/course/$courseId/subject/$subjectId': typeof CourseCourseIdSubjectSubjectIdIndexRoute
+  '/course/$courseId/subject/$subjectId/topic/$topicId': typeof CourseCourseIdSubjectSubjectIdTopicTopicIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/player': typeof PlayerRoute
+  '/saved': typeof SavedRoute
+  '/test-series': typeof TestSeriesRoute
+  '/api/proxy': typeof ApiProxyRoute
+  '/course/$courseId': typeof CourseCourseIdRouteWithChildren
+  '/course/$courseId/': typeof CourseCourseIdIndexRoute
+  '/course/$courseId/subject/$subjectId': typeof CourseCourseIdSubjectSubjectIdRouteWithChildren
+  '/course/$courseId/subject/$subjectId/': typeof CourseCourseIdSubjectSubjectIdIndexRoute
+  '/course/$courseId/subject/$subjectId/topic/$topicId': typeof CourseCourseIdSubjectSubjectIdTopicTopicIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/player'
+    | '/saved'
+    | '/test-series'
+    | '/api/proxy'
+    | '/course/$courseId'
+    | '/course/$courseId/'
+    | '/course/$courseId/subject/$subjectId'
+    | '/course/$courseId/subject/$subjectId/'
+    | '/course/$courseId/subject/$subjectId/topic/$topicId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/player'
+    | '/saved'
+    | '/test-series'
+    | '/api/proxy'
+    | '/course/$courseId'
+    | '/course/$courseId/subject/$subjectId'
+    | '/course/$courseId/subject/$subjectId/topic/$topicId'
+  id:
+    | '__root__'
+    | '/'
+    | '/player'
+    | '/saved'
+    | '/test-series'
+    | '/api/proxy'
+    | '/course/$courseId'
+    | '/course/$courseId/'
+    | '/course/$courseId/subject/$subjectId'
+    | '/course/$courseId/subject/$subjectId/'
+    | '/course/$courseId/subject/$subjectId/topic/$topicId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PlayerRoute: typeof PlayerRoute
+  SavedRoute: typeof SavedRoute
+  TestSeriesRoute: typeof TestSeriesRoute
+  ApiProxyRoute: typeof ApiProxyRoute
+  CourseCourseIdRoute: typeof CourseCourseIdRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -48,22 +164,113 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/player': {
+      id: '/player'
+      path: '/player'
+      fullPath: '/player'
+      preLoaderRoute: typeof PlayerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/saved': {
+      id: '/saved'
+      path: '/saved'
+      fullPath: '/saved'
+      preLoaderRoute: typeof SavedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/test-series': {
+      id: '/test-series'
+      path: '/test-series'
+      fullPath: '/test-series'
+      preLoaderRoute: typeof TestSeriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/proxy': {
+      id: '/api/proxy'
+      path: '/api/proxy'
+      fullPath: '/api/proxy'
+      preLoaderRoute: typeof ApiProxyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/course/$courseId': {
+      id: '/course/$courseId'
+      path: '/course/$courseId'
+      fullPath: '/course/$courseId'
+      preLoaderRoute: typeof CourseCourseIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/course/$courseId/': {
+      id: '/course/$courseId/'
+      path: '/'
+      fullPath: '/course/$courseId/'
+      preLoaderRoute: typeof CourseCourseIdIndexRouteImport
+      parentRoute: typeof CourseCourseIdRoute
+    }
+    '/course/$courseId/subject/$subjectId': {
+      id: '/course/$courseId/subject/$subjectId'
+      path: '/subject/$subjectId'
+      fullPath: '/course/$courseId/subject/$subjectId'
+      preLoaderRoute: typeof CourseCourseIdSubjectSubjectIdRouteImport
+      parentRoute: typeof CourseCourseIdRoute
+    }
+    '/course/$courseId/subject/$subjectId/': {
+      id: '/course/$courseId/subject/$subjectId/'
+      path: '/'
+      fullPath: '/course/$courseId/subject/$subjectId/'
+      preLoaderRoute: typeof CourseCourseIdSubjectSubjectIdIndexRouteImport
+      parentRoute: typeof CourseCourseIdSubjectSubjectIdRoute
+    }
+    '/course/$courseId/subject/$subjectId/topic/$topicId': {
+      id: '/course/$courseId/subject/$subjectId/topic/$topicId'
+      path: '/topic/$topicId'
+      fullPath: '/course/$courseId/subject/$subjectId/topic/$topicId'
+      preLoaderRoute: typeof CourseCourseIdSubjectSubjectIdTopicTopicIdRouteImport
+      parentRoute: typeof CourseCourseIdSubjectSubjectIdRoute
+    }
   }
 }
 
+interface CourseCourseIdSubjectSubjectIdRouteChildren {
+  CourseCourseIdSubjectSubjectIdIndexRoute: typeof CourseCourseIdSubjectSubjectIdIndexRoute
+  CourseCourseIdSubjectSubjectIdTopicTopicIdRoute: typeof CourseCourseIdSubjectSubjectIdTopicTopicIdRoute
+}
+
+const CourseCourseIdSubjectSubjectIdRouteChildren: CourseCourseIdSubjectSubjectIdRouteChildren =
+  {
+    CourseCourseIdSubjectSubjectIdIndexRoute:
+      CourseCourseIdSubjectSubjectIdIndexRoute,
+    CourseCourseIdSubjectSubjectIdTopicTopicIdRoute:
+      CourseCourseIdSubjectSubjectIdTopicTopicIdRoute,
+  }
+
+const CourseCourseIdSubjectSubjectIdRouteWithChildren =
+  CourseCourseIdSubjectSubjectIdRoute._addFileChildren(
+    CourseCourseIdSubjectSubjectIdRouteChildren,
+  )
+
+interface CourseCourseIdRouteChildren {
+  CourseCourseIdIndexRoute: typeof CourseCourseIdIndexRoute
+  CourseCourseIdSubjectSubjectIdRoute: typeof CourseCourseIdSubjectSubjectIdRouteWithChildren
+}
+
+const CourseCourseIdRouteChildren: CourseCourseIdRouteChildren = {
+  CourseCourseIdIndexRoute: CourseCourseIdIndexRoute,
+  CourseCourseIdSubjectSubjectIdRoute:
+    CourseCourseIdSubjectSubjectIdRouteWithChildren,
+}
+
+const CourseCourseIdRouteWithChildren = CourseCourseIdRoute._addFileChildren(
+  CourseCourseIdRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PlayerRoute: PlayerRoute,
+  SavedRoute: SavedRoute,
+  TestSeriesRoute: TestSeriesRoute,
+  ApiProxyRoute: ApiProxyRoute,
+  CourseCourseIdRoute: CourseCourseIdRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
