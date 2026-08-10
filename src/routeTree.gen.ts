@@ -15,6 +15,7 @@ import { Route as SavedRouteImport } from './routes/saved'
 import { Route as TestSeriesRouteImport } from './routes/test-series'
 import { Route as ApiProxyRouteImport } from './routes/api/proxy'
 import { Route as CourseCourseIdRouteImport } from './routes/course.$courseId'
+import { Route as ApiPublicStreamRouteImport } from './routes/api/public/stream'
 import { Route as CourseCourseIdIndexRouteImport } from './routes/course.$courseId.index'
 import { Route as CourseCourseIdSubjectSubjectIdRouteImport } from './routes/course.$courseId.subject.$subjectId'
 import { Route as CourseCourseIdSubjectSubjectIdIndexRouteImport } from './routes/course.$courseId.subject.$subjectId.index'
@@ -50,6 +51,11 @@ const CourseCourseIdRoute = CourseCourseIdRouteImport.update({
   path: '/course/$courseId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicStreamRoute = ApiPublicStreamRouteImport.update({
+  id: '/api/public/stream',
+  path: '/api/public/stream',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CourseCourseIdIndexRoute = CourseCourseIdIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/test-series': typeof TestSeriesRoute
   '/api/proxy': typeof ApiProxyRoute
   '/course/$courseId': typeof CourseCourseIdRouteWithChildren
+  '/api/public/stream': typeof ApiPublicStreamRoute
   '/course/$courseId/': typeof CourseCourseIdIndexRoute
   '/course/$courseId/subject/$subjectId': typeof CourseCourseIdSubjectSubjectIdRouteWithChildren
   '/course/$courseId/subject/$subjectId/': typeof CourseCourseIdSubjectSubjectIdIndexRoute
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/saved': typeof SavedRoute
   '/test-series': typeof TestSeriesRoute
   '/api/proxy': typeof ApiProxyRoute
+  '/api/public/stream': typeof ApiPublicStreamRoute
   '/course/$courseId': typeof CourseCourseIdIndexRoute
   '/course/$courseId/subject/$subjectId': typeof CourseCourseIdSubjectSubjectIdIndexRoute
   '/course/$courseId/subject/$subjectId/topic/$topicId': typeof CourseCourseIdSubjectSubjectIdTopicTopicIdRoute
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/test-series': typeof TestSeriesRoute
   '/api/proxy': typeof ApiProxyRoute
   '/course/$courseId': typeof CourseCourseIdRouteWithChildren
+  '/api/public/stream': typeof ApiPublicStreamRoute
   '/course/$courseId/': typeof CourseCourseIdIndexRoute
   '/course/$courseId/subject/$subjectId': typeof CourseCourseIdSubjectSubjectIdRouteWithChildren
   '/course/$courseId/subject/$subjectId/': typeof CourseCourseIdSubjectSubjectIdIndexRoute
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/test-series'
     | '/api/proxy'
     | '/course/$courseId'
+    | '/api/public/stream'
     | '/course/$courseId/'
     | '/course/$courseId/subject/$subjectId'
     | '/course/$courseId/subject/$subjectId/'
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/saved'
     | '/test-series'
     | '/api/proxy'
+    | '/api/public/stream'
     | '/course/$courseId'
     | '/course/$courseId/subject/$subjectId'
     | '/course/$courseId/subject/$subjectId/topic/$topicId'
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/test-series'
     | '/api/proxy'
     | '/course/$courseId'
+    | '/api/public/stream'
     | '/course/$courseId/'
     | '/course/$courseId/subject/$subjectId'
     | '/course/$courseId/subject/$subjectId/'
@@ -153,6 +165,7 @@ export interface RootRouteChildren {
   TestSeriesRoute: typeof TestSeriesRoute
   ApiProxyRoute: typeof ApiProxyRoute
   CourseCourseIdRoute: typeof CourseCourseIdRouteWithChildren
+  ApiPublicStreamRoute: typeof ApiPublicStreamRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -197,6 +210,13 @@ declare module '@tanstack/react-router' {
       path: '/course/$courseId'
       fullPath: '/course/$courseId'
       preLoaderRoute: typeof CourseCourseIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/stream': {
+      id: '/api/public/stream'
+      path: '/api/public/stream'
+      fullPath: '/api/public/stream'
+      preLoaderRoute: typeof ApiPublicStreamRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/course/$courseId/': {
@@ -270,17 +290,8 @@ const rootRouteChildren: RootRouteChildren = {
   TestSeriesRoute: TestSeriesRoute,
   ApiProxyRoute: ApiProxyRoute,
   CourseCourseIdRoute: CourseCourseIdRouteWithChildren,
+  ApiPublicStreamRoute: ApiPublicStreamRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

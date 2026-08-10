@@ -1,8 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { lazy, Suspense, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { Download, FileText, Loader2 } from "lucide-react";
 import { getVideoDetails } from "@/lib/api";
-import { decryptLink } from "@/lib/vault";
+import {
+  buildSources,
+  downloadSource,
+  pdfLinkOf,
+  type MediaSource,
+} from "@/lib/media";
 import { AppShell, EmptyState } from "@/components/layout";
 
 const VideoPlayer = lazy(() =>
@@ -40,7 +46,9 @@ export const Route = createFileRoute("/player")({
 
 function PlayerPage() {
   const { courseId, videoId } = Route.useSearch();
-  const [quality, setQuality] = useState(0);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [progress, setProgress] = useState<number | null>(null);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ["video", courseId, videoId],
@@ -48,26 +56,37 @@ function PlayerPage() {
     enabled: Boolean(courseId && videoId),
   });
 
-  const sources = useMemo(() => {
-    if (!data) return [] as { label: string; url: string }[];
-    const list: { label: string; url: string }[] = [];
-    for (const link of data.livestream_links ?? []) {
-      const url = decryptLink(link.path);
-      if (url) list.push({ label: link.quality || "Stream", url });
-    }
-    for (const link of data.encrypted_links ?? []) {
-      const url = decryptLink(link.path, link.key);
-      if (url) list.push({ label: link.quality || "Stream", url });
-    }
-    const file = decryptLink(data.file_link);
-    if (file) list.push({ label: "Original", url: file });
-    return list.filter(
-      (item, i, arr) => arr.findIndex((x) => x.url === item.url) === i,
-    );
-  }, [data]);
+  const sources = useMemo(() => buildSources(data), [data]);
+  const pdf = useMemo(() => pdfLinkOf(data), [data]);
 
-  const pdf = useMemo(() => decryptLink(data?.pdf_link), [data]);
-  const active = sources[quality] ?? sources[0];
+  useEffect(() => {
+    if (!selected && sources.length) {
+      // Default to 480p-ish for a fast, smooth start.
+      const preferred =
+        sources.find((s) => s.height === 480) ??
+        sources.find((s) => s.height === 360) ??
+        sources[0]!;
+      setSelected(preferred.url);
+    }
+  }, [sources, selected]);
+
+  const active: MediaSource | undefined =
+    sources.find((s) => s.url === selected) ?? sources[0];
+
+  const title = (data?.Title as string) ?? "Lecture";
+
+  async function handleDownload() {
+    if (!active || progress !== null) return;
+    setDownloadError(null);
+    setProgress(0);
+    try {
+      await downloadSource(active, title, setProgress);
+    } catch {
+      setDownloadError("Download fail hua. Doosri quality try karein.");
+    } finally {
+      setTimeout(() => setProgress(null), 1200);
+    }
+  }
 
   return (
     <AppShell>
@@ -94,8 +113,9 @@ function PlayerPage() {
               }
             >
               <VideoPlayer
-                key={active.url}
-                src={active.url}
+                source={active}
+                sources={sources}
+                onSelectSource={(s) => setSelected(s.url)}
                 poster={(data?.["thumbnail"] as string) || undefined}
               />
             </Suspense>
@@ -103,34 +123,72 @@ function PlayerPage() {
         )}
 
         <h1 className="mt-6 font-display text-xl font-bold text-foreground">
-          {(data?.Title as string) ?? "Lecture"}
+          {title}
         </h1>
 
+        {sources.length > 0 && (
+          <div className="mt-4">
+            <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+              Quality
+            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              {sources.map((s) => (
+                <button
+                  key={s.url}
+                  onClick={() => setSelected(s.url)}
+                  className={`rounded-lg border px-3 py-2 text-xs font-semibold transition-colors ${
+                    s.url === active?.url
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border bg-card text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          {sources.map((s, i) => (
-            <button
-              key={s.url}
-              onClick={() => setQuality(i)}
-              className={`rounded-lg border px-3 py-2 text-xs font-semibold transition-colors ${
-                i === quality
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-card text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {s.label}
-            </button>
-          ))}
+          <button
+            onClick={() => void handleDownload()}
+            disabled={!active || progress !== null}
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground hover:bg-secondary disabled:opacity-70"
+          >
+            {progress === null ? (
+              <Download className="h-4 w-4" />
+            ) : (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            )}
+            {progress === null
+              ? `Download ${active?.label ?? ""}`.trim()
+              : `Downloading ${progress}%`}
+          </button>
+
           {pdf && (
             <a
               href={pdf}
               target="_blank"
               rel="noreferrer"
-              className="rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground hover:bg-secondary"
+              className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground hover:bg-secondary"
             >
-              ⬇ Notes / PDF
+              <FileText className="h-4 w-4" /> Notes / PDF
             </a>
           )}
         </div>
+
+        {progress !== null && (
+          <div className="mt-3 h-1.5 w-full max-w-sm overflow-hidden rounded-full bg-secondary">
+            <div
+              className="h-full rounded-full bg-primary transition-all"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        )}
+
+        {downloadError && (
+          <p className="mt-2 text-xs text-destructive">{downloadError}</p>
+        )}
       </div>
     </AppShell>
   );
