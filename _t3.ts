@@ -1,0 +1,11 @@
+import { decryptLink, decryptVault } from "./src/lib/vault";
+const U="https://spidyrwa.vercel.app", A="lalit_pro_max_v1_secure_2026";
+const r=await fetch(`${U}/api/proxy?endpoint=${encodeURIComponent("get/fetchVideoDetailsById?course_id=582&video_id=308137&ytflag=0&folder_wise_course=0")}`,{headers:{"x-spidy-vault-auth":A}});
+const j:any=await r.json(); const d=(decryptVault<any>(j.vaultData)).data;
+const url=decryptLink(d.download_links[2].path);
+const res=await fetch(url,{headers:{origin:"https://example.com"}});
+console.log(res.status, JSON.stringify(Object.fromEntries(res.headers)));
+console.log((await res.text()).slice(0,500));
+const mp4=decryptLink(d.file_link);
+const r2=await fetch(mp4,{method:"HEAD",headers:{origin:"https://example.com"}});
+console.log("mp4",r2.status,JSON.stringify(Object.fromEntries(r2.headers)));
