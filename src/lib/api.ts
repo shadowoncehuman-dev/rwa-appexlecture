@@ -54,11 +54,17 @@ async function vaultFetch<T>(endpoint: string): Promise<T | null> {
   const res = await fetch(`/api/proxy?endpoint=${encodeURIComponent(endpoint)}`, {
     cache: "no-store",
   });
-  if (!res.ok) return null;
+  if (!res.ok) {
+    throw new Error(`Content API request failed with status ${res.status}`);
+  }
   const json = (await res.json()) as { vaultData?: string; error?: string };
-  if (!json?.vaultData) return null;
+  if (!json?.vaultData) {
+    throw new Error("Content API response did not contain encrypted data");
+  }
   const decoded = decryptVault<{ data?: T } | T>(json.vaultData);
-  if (!decoded) return null;
+  if (decoded == null) {
+    throw new Error("Content API response could not be decrypted");
+  }
   const maybe = decoded as { data?: T };
   return (maybe && typeof maybe === "object" && "data" in maybe
     ? maybe.data

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getLectures, getTopics } from "@/lib/api";
-import { AppShell, EmptyState, PageHeader } from "@/components/layout";
+import { AppShell, EmptyState, LoadError, PageHeader } from "@/components/layout";
 
 export const Route = createFileRoute(
   "/course/$courseId/subject/$subjectId/topic/$topicId",
@@ -68,6 +68,11 @@ function TopicPage() {
       <div className="mx-auto w-full max-w-6xl px-4 py-8">
         {lectures.isLoading ? (
           <EmptyState message="Lectures load ho rahe hain…" />
+        ) : lectures.isError ? (
+          <LoadError
+            message="Lectures load nahi ho paaye. Content server se response nahi mila."
+            onRetry={() => void lectures.refetch()}
+          />
         ) : !lectures.data?.length ? (
           <EmptyState message="Is topic me koi lecture nahi mila." />
         ) : (

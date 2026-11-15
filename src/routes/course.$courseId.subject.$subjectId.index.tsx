@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getSubjects, getTopics } from "@/lib/api";
-import { AppShell, EmptyState, PageHeader } from "@/components/layout";
+import { AppShell, EmptyState, LoadError, PageHeader } from "@/components/layout";
 import { TileCard } from "@/components/cards";
 
 export const Route = createFileRoute("/course/$courseId/subject/$subjectId/")({
@@ -67,6 +67,11 @@ function SubjectPage() {
       <div className="mx-auto w-full max-w-6xl px-4 py-8">
         {topics.isLoading ? (
           <EmptyState message="Topics load ho rahe hain…" />
+        ) : topics.isError ? (
+          <LoadError
+            message="Topics load nahi ho paaye. Content server se response nahi mila."
+            onRetry={() => void topics.refetch()}
+          />
         ) : !topics.data?.length ? (
           <EmptyState message="Is subject me koi topic nahi mila." />
         ) : (

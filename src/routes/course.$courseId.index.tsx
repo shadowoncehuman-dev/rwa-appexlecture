@@ -7,7 +7,7 @@ import {
   getSubjects,
   type TestSeries,
 } from "@/lib/api";
-import { AppShell, EmptyState, PageHeader } from "@/components/layout";
+import { AppShell, EmptyState, LoadError, PageHeader } from "@/components/layout";
 import { TileCard } from "@/components/cards";
 import { isSaved, toggleSaved } from "@/lib/saved";
 
@@ -136,6 +136,11 @@ function CoursePage() {
         {tab === "subjects" ? (
           subjects.isLoading ? (
             <EmptyState message="Subjects load ho rahe hain…" />
+          ) : subjects.isError ? (
+            <LoadError
+              message="Batch ke subjects load nahi ho paaye. Content server se response nahi mila."
+              onRetry={() => void subjects.refetch()}
+            />
           ) : !subjects.data?.length ? (
             <EmptyState message="Is batch me koi subject nahi mila." />
           ) : (

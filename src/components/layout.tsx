@@ -114,3 +114,18 @@ export function EmptyState({ message }: { message: string }) {
     </div>
   );
 }
+
+export function LoadError({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="card-soft px-6 py-12 text-center">
+      <p className="text-sm text-muted-foreground">{message}</p>
+      <button
+        type="button"
+        onClick={onRetry}
+        className="mt-4 rounded-xl border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
+      >
+        Retry
+      </button>
+    </div>
+  );
+}
