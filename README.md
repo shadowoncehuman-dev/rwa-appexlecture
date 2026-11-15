@@ -24,3 +24,9 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+## Deploying to Vercel
+
+The production build uses Nitro's Vercel preset to package the TanStack Start
+server for Vercel Functions. Vercel can use the default `npm run build` build
+command; no static output directory should be configured.
